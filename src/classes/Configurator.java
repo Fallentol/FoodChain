@@ -10,11 +10,11 @@ public class Configurator {
 
     public static int sheepVision = 10;
     public static int gameTemp = 100; // задержка отрисовки кадров
-    public static int grassGrowthRate = 800; // через сколько шагов трава отрастает
+    public static int grassGrowthRate = 1200; // через сколько шагов трава отрастает
     public static int shipSatiety = 200; // сытость овцы
     public static int shipAppetit = 2; // сколько травы овца сьедает за одну травяную клетку
-    public static int directRunTurns = 3; // количество ходов, после которых стоит сменить направление (чем больше, тем реже направление меняется)
-    public static int shipHollyLifeDaysRate = 30; // порог после которого овца может размножаться
+    public static int directRunTurns = 4; // количество ходов, после которых стоит сменить направление (чем больше, тем реже направление меняется)
+    public static int shipHollyLifeDaysRate = 40; // порог после которого овца может размножаться
 
 
 }

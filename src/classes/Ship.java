@@ -31,7 +31,7 @@ public class Ship extends Sprite {
             condition = 0;
         }
 
-        if (satiety > 0.9 * Configurator.shipSatiety) {
+        if (satiety > 0.95 * Configurator.shipSatiety) {
             hollyLifeDays++;
         } else {
             hollyLifeDays = 0;
@@ -78,6 +78,7 @@ public class Ship extends Sprite {
             if (Y > Configurator.HEIGHT - 40) newY = Y - dim;
             Ship s = new Ship(X + dim, Y + dim);
             s.color = new Color(223, 196, 65);
+            hollyLifeDays = 0;
             return s;
         }
         return null;
@@ -107,7 +108,7 @@ public class Ship extends Sprite {
     private void receiveRestriction() {
         super.autoCorrectionDirection();
         for (LocationResult lr : Field.getLocationResults(X, Y, vision)) {
-            System.out.println("РЕКОМЕНДАЦИИ ПОСТУПИЛИ rl=" + lr.UP + " " + lr.DOWN + " " + lr.RIGHT + " " + lr.LEFT);
+            //System.out.println("РЕКОМЕНДАЦИИ ПОСТУПИЛИ rl=" + lr.UP + " " + lr.DOWN + " " + lr.RIGHT + " " + lr.LEFT);
             if (lr.sprite.type == Type.SHIP) { // если встретил овцу
                 if (lr.DOWN) DOWN = -1;
                 if (lr.UP) UP = -1;

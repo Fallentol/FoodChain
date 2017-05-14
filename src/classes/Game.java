@@ -117,7 +117,7 @@ public class Game extends Canvas implements Runnable {
 
         Field.prepareField();
         entites.add(new Ship(800, 200));
-        entites.add(new Ship(300, 100));
+        /*entites.add(new Ship(300, 100));
         entites.add(new Ship(500, 300));
         entites.add(new Ship(500, 24));
         entites.add(new Ship(200, 80));
@@ -169,7 +169,7 @@ public class Game extends Canvas implements Runnable {
         entites.add(new Ship(40, 220));
         entites.add(new Ship(40, 260));
         entites.add(new Ship(40, 300));
-        entites.add(new Ship(40, 360));
+        entites.add(new Ship(40, 360));*/
 
         addKeyListener(new KeyInputHandler());
     }
