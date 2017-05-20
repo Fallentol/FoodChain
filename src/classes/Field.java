@@ -45,7 +45,12 @@ public class Field {
      * @param sprite
      */
     public static void setEntity(Sprite sprite) {
-        field[sprite.X / Configurator.pixels][sprite.Y / Configurator.pixels].entity = sprite;
+        try {
+            field[sprite.X / Configurator.pixels][sprite.Y / Configurator.pixels].entity = sprite;
+        } catch (Exception e) {
+            System.out.println("X=" + sprite.X + " Y=" + sprite.Y);
+
+        }
     }
 
     /**
@@ -58,11 +63,11 @@ public class Field {
      */
     public static ArrayList<LocationResult> getLocationResults(int x, int y, int size) {
         ArrayList<LocationResult> results = new ArrayList<LocationResult>();
+        //System.out.println("x:" + x + " y:" + y + " s:" + size);
 
         for (int i = x - size; i <= x + size; i++) {
             for (int j = y - size; j <= y + size; j++) {
-                if (x > Configurator.fieldX - size - 1 || y > Configurator.fieldY - size - 1
-                        || y - size < 0 || x - size < 0 || field[i][j].entity == null) {
+                if ((i == x && y == j) || i > Configurator.fieldX - 1 || j > Configurator.fieldY - 1 || i < 0 || j < 0 || field[i][j].entity == null) {
                     continue;
                 }
                 LocationResult locatorResult = new LocationResult(field[i][j].entity);
@@ -73,10 +78,10 @@ public class Field {
                 if (i > x) {
                     locatorResult.RIGHT = true;
                 }
-                if (j < y) {
+                if (j > y) {
                     locatorResult.DOWN = true;
                 }
-                if (j > y) {
+                if (j < y) {
                     locatorResult.UP = true;
                 }
                 results.add(locatorResult);
@@ -104,7 +109,7 @@ public class Field {
     }
 
     /**
-     * Метод обновляет поле, заставляя просчитать поведение каждой клетки
+     * Метод обновляет поле, заставляя просчитать поведение каждой травяной клетки
      */
     public static void renewGround() {
         for (int i = 0; i < field.length; i++) {
@@ -150,7 +155,7 @@ public class Field {
      */
     public static class Cellular {
         public Cellular(int x, int y) {
-            background = new Ground(x * 4, y * 4);
+            background = new Ground(x * Configurator.pixels, y * Configurator.pixels);
         }
 
         Sprite background; // трава/земля/вода

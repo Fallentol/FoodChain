@@ -23,6 +23,7 @@ public class Game extends Canvas implements Runnable {
     Sprite recordSmen;
     private ArrayList<Sprite> entites = new ArrayList<>();
     String log = "";
+    String log2 = "";
     String staticLog = "";
 
 
@@ -50,24 +51,33 @@ public class Game extends Canvas implements Runnable {
 
     public void update(long delta) {
         log = "";
-        Field.eraseField();
-        Field.renewGround();// обновлет поле
+        Field.eraseField(); // очищает поле от живности
+        Field.renewGround();// обновлет траву на поле
 
         ArrayList<Sprite> spriteList = new ArrayList<>();
         for (Sprite s : entites) {
-            if (s.condition > 0) {
+            if (s.condition > 0) { // если сущность жива
                 Field.setEntity(s);
                 spriteList.add(s);
             }
         }
         entites = spriteList;
 
+        int totalWolfs = 0;
+        int totalShips = 0;
         ArrayList<Sprite> newShipList = new ArrayList<>();
         for (Sprite s : entites) {
             s.calculateBehavior();
             Sprite n = s.reproduction();
+            if (s.type == Sprite.Type.WOLF) {
+                log += "WolfS:" + s.satiety + " ";
+                totalWolfs++;
+            } else {
+                totalShips++;
+            }
             if (n != null) newShipList.add(n);
         }
+        log2 = " Wolves = " + totalWolfs + " Ships=" + totalShips;
         entites.addAll(newShipList);
     }
 
@@ -80,43 +90,33 @@ public class Game extends Canvas implements Runnable {
         }
         Graphics g = bs.getDrawGraphics();
 
-        log += "Quantity e = " + entites.size();
-        paintField(g);
-        Field.renderField(g);
-        paintGrid(g);
 
-        int minimalS = Configurator.shipSatiety;
-        int maxLT = 0;
-        for (Sprite s : entites) {
-            if (s.satiety < minimalS) {
-                minimalS = s.satiety;
-            }
-            if (s.lifeTurn > maxLT) {
-                maxLT = s.lifeTurn;
-                s.color = new Color(63, 86, 250);
-                if (recordSmen != null && recordSmen != s) {
-                    staticLog += " Смена_рекордсмена/ ";
-                }
-                recordSmen = s;
+        paintField(g); // рендерится зеленый квадрат
+        Field.renderField(g);// ренедерится трава и живность
+        paintGrid(g); // рендерится сетка
 
-            }
-        }
-        if (maxLT > lifeTurnRecord) lifeTurnRecord = maxLT;
-        log += " минимальная сытость!! =" + minimalS + " старожил живет " + maxLT + " тактов, а рекорд " + lifeTurnRecord + " !! " + staticLog;
+        //log += entites.get(0).getSprieReport();
+        //log2 += entites.get(1).getSprieReport();
 
 
         outLOG(g);
         g.dispose();
         bs.show();
 
-        //Thread.sleep(Configurator.temp);
+        //Thread.sleep(Configurator.gameTemp);
 
     }
 
     public void init() {
 
         Field.prepareField();
-        entites.add(new Ship(800, 200));
+        entites.add(new Ship(24, 24));
+        entites.add(new Ship(80, 80));
+        entites.add(new Ship(120, 120));
+        entites.add(new Ship(200, 120));
+        entites.add(new Wolf(400, 88));
+        entites.add(new Wolf(440, 96));
+        //entites.add(new Ship(120, 120));
         /*entites.add(new Ship(300, 100));
         entites.add(new Ship(500, 300));
         entites.add(new Ship(500, 24));
@@ -191,10 +191,10 @@ public class Game extends Canvas implements Runnable {
      */
     private void paintGrid(Graphics g) {
         g.setColor(Color.GRAY);
-        for (int i = 4; i <= Configurator.HEIGHT; i += 4) {
+        for (int i = Configurator.pixels; i <= Configurator.HEIGHT; i += Configurator.pixels) {
             g.drawLine(0, i, Configurator.WIDTH, i);
         }
-        for (int i = 4; i <= Configurator.WIDTH; i += 4) {
+        for (int i = Configurator.pixels; i <= Configurator.WIDTH; i += Configurator.pixels) {
             g.drawLine(i, 0, i, Configurator.HEIGHT);
         }
     }
@@ -205,10 +205,11 @@ public class Game extends Canvas implements Runnable {
      * @param g
      */
     private void outLOG(Graphics g) {
-        int fontSize = 15;
+        int fontSize = 20;
         g.setFont(new Font("TimesRoman", Font.BOLD, fontSize));
-        g.setColor(Color.RED);
-        g.drawString(log, 10, 20);
+        g.setColor(Color.YELLOW);
+        g.drawString(log, 2, Configurator.HEIGHT - 40);
+        g.drawString(log2, 2, Configurator.HEIGHT - 10);
     }
 
 

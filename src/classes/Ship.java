@@ -1,7 +1,6 @@
 package classes;
 
 import java.awt.*;
-import java.util.ArrayList;
 
 /**
  * Сущность овца
@@ -16,6 +15,7 @@ public class Ship extends Sprite {
         color = new Color(168, 193, 190);
         type = Type.SHIP;
         satiety = Configurator.shipSatiety;
+        name = String.valueOf((int) (Math.random() * 5));
     }
 
     int hollyLifeDays = 0;
@@ -27,11 +27,11 @@ public class Ship extends Sprite {
         if (condition == 1) {
             feeding();
         }
-        if (satiety <= 0) {
+        if (satiety <= 0) { // если еда закончилась - переходит в режим умерла
             condition = 0;
         }
 
-        if (satiety > 0.95 * Configurator.shipSatiety) {
+        if (satiety > 0.8 * Configurator.shipSatiety) { // если довольно упитанная - срабатывает счетчик счастливых дней
             hollyLifeDays++;
         } else {
             hollyLifeDays = 0;
@@ -40,7 +40,7 @@ public class Ship extends Sprite {
         if (hollyLifeDays > Configurator.shipHollyLifeDaysRate) {
             color = new Color(168, 193, 190);
         }
-        lifeTurn++;
+        lifeTurn++; // счетчик прожитих дней
 
     }
 
@@ -52,7 +52,7 @@ public class Ship extends Sprite {
      */
     @Override
     void outsideImpactTrigger(int i) {
-
+        condition = 0;
     }
 
     @Override
@@ -69,17 +69,29 @@ public class Ship extends Sprite {
         if (hollyLifeDays < Configurator.shipHollyLifeDaysRate)
             return null; // если счастливых дней недостаточно не размножаться
 
-        if (((int) (Math.random() * 300) == 0)) {
+        if (((int) (Math.random() * Configurator.shipRepairChanse) == 0)) {
+
             int newX = X + dim;
             int newY = Y + dim;
-            if (X < 40) newX = X + dim;
-            if (Y < 40) newX = Y + dim;
-            if (X > Configurator.WIDTH - 40) newX = X - dim;
-            if (Y > Configurator.HEIGHT - 40) newY = Y - dim;
-            Ship s = new Ship(X + dim, Y + dim);
+
+            if (X <= Configurator.pixels * 2) {
+                newX = X + dim;
+            }
+            if (Y < Configurator.pixels * 2) {
+                newY = Y + dim;
+            }
+            if (X >= Configurator.WIDTH - Configurator.pixels * 2) {
+                newX = X - dim;
+            }
+            if (Y >= Configurator.HEIGHT - Configurator.pixels * 2) {
+                newY = Y - dim;
+            }
+            Ship s = new Ship(newX, newY);
             s.color = new Color(223, 196, 65);
             hollyLifeDays = 0;
+
             return s;
+
         }
         return null;
     }
@@ -92,12 +104,12 @@ public class Ship extends Sprite {
      * 3-влево
      */
     private void feeding() {
-        Field.Cellular cell = Field.getCellular(X / dim, Y / dim);
+        Field.Cellular cell = Field.getCellular(X / dim, Y / dim); // получаем клетку поля для проверки наличия в ней травы
         if (cell.background.condition == 0) { // если трава была и все впорядке
             cell.background.outsideImpactTrigger(0);
             if (satiety < Configurator.shipSatiety) satiety += Configurator.shipAppetit; // повысить сытость
         } else {
-            satiety--;
+            satiety--; // если овца прошла по пустой клетке - её сытость уменьшилась
         }
         receiveRestriction(); //сбрасываем старые рекомендации и получаем новые по поводу стенок поля
         normalMove();
@@ -107,7 +119,7 @@ public class Ship extends Sprite {
 
     private void receiveRestriction() {
         super.autoCorrectionDirection();
-        for (LocationResult lr : Field.getLocationResults(X, Y, vision)) {
+        for (LocationResult lr : Field.getLocationResults(X / Configurator.pixels, Y / Configurator.pixels, vision)) {
             //System.out.println("РЕКОМЕНДАЦИИ ПОСТУПИЛИ rl=" + lr.UP + " " + lr.DOWN + " " + lr.RIGHT + " " + lr.LEFT);
             if (lr.sprite.type == Type.SHIP) { // если встретил овцу
                 if (lr.DOWN) DOWN = -1;
@@ -124,9 +136,9 @@ public class Ship extends Sprite {
         while (calcIteration > 0 && recalculate) {
             calcIteration--;
             int direction = lastTurnDirection;
-            if (((int) (Math.random() * Configurator.directRunTurns) == 0)) { //  один раз в N количесво ходов нужно сменить направление
+            if (((int) (Math.random() * Configurator.shipDirectRunTurns) == 0)) { //  один раз в N количесво ходов нужно сменить направление
                 direction = (int) (Math.random() * 4);
-                //direction = 0; // для отладки движение только вверх
+                //direction = 2; // для отладки движение только вверх
                 lastTurnDirection = direction;
             }
             if (direction == 0 && UP >= 0) {
@@ -136,13 +148,20 @@ public class Ship extends Sprite {
                 recalculate = false;
             }
             if (direction == 1 && RIGHT >= 0) {
-                if (X > Configurator.WIDTH - dim * 2) continue;
+                if (X > Configurator.WIDTH - dim * 2) {
+                    System.out.println("crityc X=" + X + " Configurator.WIDTH=" + (Configurator.WIDTH - dim * 2));
+                }
+                if (X >= Configurator.WIDTH - dim) continue;
+
                 Field.makeTurn(X / dim, Y / dim, (X / dim) + 1, Y / dim);
                 X += dim;
                 recalculate = false;
             }
             if (direction == 2 && DOWN >= 0) {
-                if (Y > Configurator.HEIGHT - dim * 5) continue;
+                if (Y > Configurator.HEIGHT - dim * 2) {
+                    System.out.println("crityc Y=" + Y);
+                }
+                if (Y >= Configurator.HEIGHT - dim) continue;
                 Field.makeTurn(X / dim, Y / dim, X / dim, (Y / dim) + 1);
                 Y += dim;
                 recalculate = false;

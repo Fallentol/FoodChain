@@ -16,6 +16,7 @@ public abstract class Sprite {
     public int satiety;
     public int lastTurnDirection;
     public int lifeTurn = 0;
+    public String name;
     /**
      * Позиции для смены координат (рекомендации)
      * 0=доступна
@@ -43,6 +44,14 @@ public abstract class Sprite {
     public Sprite(int x, int y) {
         X = x;
         Y = y;
+    }
+
+    public String getRecomendation (int x) {
+        String result = "";
+        if (x == 0) result = "free";
+        if (x == 1) result = "best";
+        if (x == -1) result = "avoid";
+        return result;
     }
 
     /**
@@ -73,10 +82,25 @@ public abstract class Sprite {
     void autoCorrectionDirection() {
         if (type == Type.GROUND) return; // для травы рекомендации не нужны
         UP = DOWN = LEFT = RIGHT = 0;
-        if (X == Configurator.WIDTH - 2 * Configurator.pixels) RIGHT = -1;
-        if (X < 2 * Configurator.pixels) LEFT = -1;
-        if (Y > Configurator.HEIGHT - 2 * Configurator.pixels) DOWN = -1;
-        if (Y < 2 * Configurator.pixels) UP = -1;
+        // X Y - координаты поля отрисовки, а не из массива
+        if (X >= Configurator.WIDTH - Configurator.pixels) RIGHT = -1;
+        if (X < Configurator.pixels) LEFT = -1;
+        if (Y >= Configurator.HEIGHT - Configurator.pixels) DOWN = -1;
+        if (Y < Configurator.pixels) UP = -1;
+    }
+
+    public String getSprieReport() {
+        String result = "Sprite " + name + "\n";
+        result += " Direction UP:" + getRecomendation(UP);
+        result += " RIGHT:" + getRecomendation(RIGHT);
+        result += " DOWN:" + getRecomendation(DOWN);
+        result += " LEFT:" + getRecomendation(LEFT);
+        result += " Stat:" + condition;
+        result += " X:" + X/Configurator.pixels;
+        result += " Y:" + Y/Configurator.pixels;
+        result += " Satiety:" + satiety;
+        result += " Years:" + lifeTurn;
+        return result;
     }
 
 

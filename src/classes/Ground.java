@@ -61,7 +61,7 @@ public class Ground extends Sprite {
     private void grassEaten() {
         grossRiseTurns = Configurator.grassGrowthRate;
         condition = 1;
-        color = new Color(59, 66, 35);
+        color = new Color(89, 103, 51);
     }
 
 
